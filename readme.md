@@ -1,5 +1,17 @@
 ## ECDSA Node
 
+# two ways to allowing user A to send money to user B : 
+
+- User A give his private key to his website, website checks if it's the good private key. not the best way for obvious reasons.
+- User A give a signature, the server verify it's the good signature. more secure way. 
+
+
+Let's do option 2 
+what do ? 
+
+- Create the message to sign. it contains : Nonce, Amount, Recipient. I've added a module to sign directly to the frontend. Everything in the module is done locally so not a single private key is send to the server. 
+
+##
 This project is an example of using a client and server to facilitate transfers between different addresses. Since there is just a single server on the back-end handling transfers, this is clearly very centralized. We won't worry about distributed consensus for this project.
 
 However, something that we would like to incoporate is Public Key Cryptography. By using Elliptic Curve Digital Signatures we can make it so the server only allows transfers that have been signed for by the person who owns the associated address.

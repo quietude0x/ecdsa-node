@@ -1,24 +1,37 @@
-import { useState } from "react";
+import { toHex } from "ethereum-cryptography/utils";
 import server from "./server";
+import { hashMessage } from "./utils";
 
-function Transfer({ address, setBalance }) {
-  const [sendAmount, setSendAmount] = useState("");
-  const [recipient, setRecipient] = useState("");
+function Transfer({ address, setBalance, nonce, setNonce, recipient, setRecipient, sendAmount, setSendAmount, signature, setSignature, recoveryBit, setRecoveryBit}) {
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
   async function transfer(evt) {
     evt.preventDefault();
 
+    const message = toHex(
+      hashMessage(
+        JSON.stringify({
+          recipient,
+          amount: parseInt(sendAmount),
+          nonce: parseInt(nonce),
+        })
+      )
+    )
+
     try {
       const {
-        data: { balance },
+        data: { balance, nonce },
       } = await server.post(`send`, {
         sender: address,
+        signature,
+        recoveryBit,
+        message,
         amount: parseInt(sendAmount),
         recipient,
       });
       setBalance(balance);
+      setNonce(nonce);
     } catch (ex) {
       alert(ex.response.data.message);
     }
@@ -40,9 +53,37 @@ function Transfer({ address, setBalance }) {
       <label>
         Recipient
         <input
-          placeholder="Type an address, for example: 0x2"
+          placeholder="Type an address "
           value={recipient}
           onChange={setValue(setRecipient)}
+        ></input>
+      </label>
+
+      <label>
+        Nonce
+        <input
+          placeholder="Type the nonce"
+          value={nonce}
+          onChange={setValue(setNonce)}
+        ></input>
+      </label>
+
+      <label>
+       Recovery Bit 
+        <input
+        type="number"
+          placeholder="Type the recovery bit"
+          value={recoveryBit}
+          onChange={setValue(setRecoveryBit)}
+        ></input>
+      </label>
+
+      <label>
+        Signature 
+        <input
+          placeholder="Type the signature hash"
+          value={signature}
+          onChange={setValue(setSignature)}
         ></input>
       </label>
 
